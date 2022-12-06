@@ -22,6 +22,7 @@ const Landed_1 = require("./Rules/Landed");
 const Launch_1 = require("./Rules/Launch");
 const Lost_1 = require("./Rules/Lost");
 const PartBuilt_1 = require("./Rules/PartBuilt");
+const Yield_1 = require("./Rules/Yield");
 class Spaceship extends DataObject_1.DataObject {
     constructor(player, ruleRegistry = RuleRegistry_1.instance, turn = Turn_1.instance, randomNumberGenerator = () => Math.random()) {
         super();
@@ -48,7 +49,7 @@ class Spaceship extends DataObject_1.DataObject {
     check() {
         if (__classPrivateFieldGet(this, _Spaceship_successful, "f") !== null ||
             __classPrivateFieldGet(this, _Spaceship_launched, "f") === false ||
-            ((__classPrivateFieldGet(this, _Spaceship_launched, "f") + this.flightTime()) < __classPrivateFieldGet(this, _Spaceship_turn, "f").value())) {
+            __classPrivateFieldGet(this, _Spaceship_launched, "f") + this.flightTime() < __classPrivateFieldGet(this, _Spaceship_turn, "f").value()) {
             return;
         }
         const chanceOfSuccess = Math.max(...__classPrivateFieldGet(this, _Spaceship_ruleRegistry, "f").process(ChanceOfSuccess_1.default, this), 0);
@@ -80,6 +81,15 @@ class Spaceship extends DataObject_1.DataObject {
     }
     successful() {
         return __classPrivateFieldGet(this, _Spaceship_successful, "f");
+    }
+    yield(yields) {
+        yields.forEach((shipYield) => __classPrivateFieldGet(this, _Spaceship_parts, "f").forEach((part) => {
+            const partYield = shipYield.clone();
+            partYield.set(0);
+            __classPrivateFieldGet(this, _Spaceship_ruleRegistry, "f").process(Yield_1.default, part, partYield);
+            shipYield.add(partYield);
+        }));
+        return yields;
     }
 }
 exports.Spaceship = Spaceship;

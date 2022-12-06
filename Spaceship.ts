@@ -18,6 +18,8 @@ import Lost from './Rules/Lost';
 import Part from './Part';
 import PartBuilt from './Rules/PartBuilt';
 import Player from '@civ-clone/core-player/Player';
+import Yield from '@civ-clone/core-yield/Yield';
+import YieldRule from './Rules/Yield';
 
 export interface ISpaceship extends IDataObject {
   add(part: Part): void;
@@ -28,6 +30,7 @@ export interface ISpaceship extends IDataObject {
   parts(): Part[];
   player(): Player;
   successful(): boolean | null;
+  yield(yields: Yield[]): Yield[];
 }
 
 export class Spaceship extends DataObject implements ISpaceship {
@@ -116,6 +119,22 @@ export class Spaceship extends DataObject implements ISpaceship {
 
   successful(): boolean | null {
     return this.#successful;
+  }
+
+  yield(yields: Yield[]): Yield[] {
+    yields.forEach((shipYield: Yield): void =>
+      this.#parts.forEach((part) => {
+        const partYield = shipYield.clone();
+
+        partYield.set(0);
+
+        this.#ruleRegistry.process(YieldRule, part, partYield);
+
+        shipYield.add(partYield);
+      })
+    );
+
+    return yields;
   }
 }
 

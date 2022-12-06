@@ -6,6 +6,7 @@ import { RuleRegistry } from '@civ-clone/core-rule/RuleRegistry';
 import { Turn } from '@civ-clone/core-turn-based-game/Turn';
 import Part from './Part';
 import Player from '@civ-clone/core-player/Player';
+import Yield from '@civ-clone/core-yield/Yield';
 export interface ISpaceship extends IDataObject {
   add(part: Part): void;
   check(): void;
@@ -15,6 +16,7 @@ export interface ISpaceship extends IDataObject {
   parts(): Part[];
   player(): Player;
   successful(): boolean | null;
+  yield(yields: Yield[]): Yield[];
 }
 export declare class Spaceship extends DataObject implements ISpaceship {
   #private;
@@ -35,5 +37,6 @@ export declare class Spaceship extends DataObject implements ISpaceship {
   parts(): Part[];
   player(): Player;
   successful(): boolean | null;
+  yield(yields: Yield[]): Yield[];
 }
 export default Spaceship;
