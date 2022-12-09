@@ -6,23 +6,25 @@ import Player from '@civ-clone/core-player/Player';
 import Spaceship from './Spaceship';
 
 export interface ISpaceshipRegistry extends IEntityRegistry<Spaceship> {
-  getByPlayer(player: Player): Spaceship;
+  getActiveByPlayer(player: Player): Spaceship | null;
 }
 
 export class SpaceshipRegistry
   extends EntityRegistry<Spaceship>
   implements ISpaceshipRegistry
 {
-  getByPlayer(player: Player): Spaceship {
+  constructor() {
+    super(Spaceship);
+  }
+
+  getActiveByPlayer(player: Player): Spaceship | null {
     const [spaceship] = this.getBy('player', player).filter(
       (spaceship) =>
         spaceship.launched() === false || spaceship.successful() === null
     );
 
     if (!spaceship) {
-      throw new TypeError(
-        `Wrong number of Spaceships for player ${player.id()}.`
-      );
+      return null;
     }
 
     return spaceship;

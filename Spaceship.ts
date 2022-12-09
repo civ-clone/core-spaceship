@@ -16,10 +16,10 @@ import Landed from './Rules/Landed';
 import Launch from './Rules/Launch';
 import Lost from './Rules/Lost';
 import Part from './Part';
-import PartBuilt from './Rules/PartBuilt';
+import Built from './Rules/Built';
 import Player from '@civ-clone/core-player/Player';
 import Yield from '@civ-clone/core-yield/Yield';
-import YieldRule from './Rules/Yield';
+import Validate from './Rules/Validate';
 
 export interface ISpaceship extends IDataObject {
   add(part: Part): void;
@@ -30,7 +30,7 @@ export interface ISpaceship extends IDataObject {
   parts(): Part[];
   player(): Player;
   successful(): boolean | null;
-  yield(yields: Yield[]): Yield[];
+  yields(): Yield[];
 }
 
 export class Spaceship extends DataObject implements ISpaceship {
@@ -55,16 +55,28 @@ export class Spaceship extends DataObject implements ISpaceship {
     this.#turn = turn;
     this.#randomNumberGenerator = randomNumberGenerator;
 
-    this.addKey('flightTime', 'launched', 'parts', 'player', 'successful');
+    this.addKey(
+      'flightTime',
+      'launched',
+      'parts',
+      'player',
+      'successful',
+      'yields'
+    );
   }
 
   add(part: Part): void {
-    if (this.#launched) {
+    if (
+      this.#launched ||
+      !this.#ruleRegistry
+        .process(Validate, part, this)
+        .every((result) => result)
+    ) {
       return;
     }
 
     this.#parts.push(part);
-    this.#ruleRegistry.process(PartBuilt, part, this);
+    this.#ruleRegistry.process(Built, part, this);
   }
 
   check(): void {
@@ -121,20 +133,8 @@ export class Spaceship extends DataObject implements ISpaceship {
     return this.#successful;
   }
 
-  yield(yields: Yield[]): Yield[] {
-    yields.forEach((shipYield: Yield): void =>
-      this.#parts.forEach((part) => {
-        const partYield = shipYield.clone();
-
-        partYield.set(0);
-
-        this.#ruleRegistry.process(YieldRule, part, partYield);
-
-        shipYield.add(partYield);
-      })
-    );
-
-    return yields;
+  yields(): Yield[] {
+    return this.#parts.flatMap((part: Part) => part.yields());
   }
 }
 

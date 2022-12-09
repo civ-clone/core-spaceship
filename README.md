@@ -10,5 +10,5 @@ constructed) and the associated `Rule`s.
 - `Landed` - triggered when the `Spaceship` successfully lands at its destination.
 - `Launch` - triggered when the `Spaceship` is launched.
 - `Lost` - triggered when the `Spaceship` doesn't reach its final destination.
-- `PartBuilt` - triggered when a `Part` is built.
+- `Built` - triggered when a `Part` is built.
 - `Yield` - used to calculate the associated `Yield`s from each `Part` (`Mass`, `Fuel`, `Population`, etc).

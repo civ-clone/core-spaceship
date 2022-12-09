@@ -5,13 +5,14 @@ import {
 import Player from '@civ-clone/core-player/Player';
 import Spaceship from './Spaceship';
 export interface ISpaceshipRegistry extends IEntityRegistry<Spaceship> {
-  getByPlayer(player: Player): Spaceship;
+  getActiveByPlayer(player: Player): Spaceship | null;
 }
 export declare class SpaceshipRegistry
   extends EntityRegistry<Spaceship>
   implements ISpaceshipRegistry
 {
-  getByPlayer(player: Player): Spaceship;
+  constructor();
+  getActiveByPlayer(player: Player): Spaceship | null;
 }
 export declare const instance: SpaceshipRegistry;
 export default SpaceshipRegistry;

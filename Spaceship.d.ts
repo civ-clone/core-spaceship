@@ -16,7 +16,7 @@ export interface ISpaceship extends IDataObject {
   parts(): Part[];
   player(): Player;
   successful(): boolean | null;
-  yield(yields: Yield[]): Yield[];
+  yields(): Yield[];
 }
 export declare class Spaceship extends DataObject implements ISpaceship {
   #private;
@@ -37,6 +37,6 @@ export declare class Spaceship extends DataObject implements ISpaceship {
   parts(): Part[];
   player(): Player;
   successful(): boolean | null;
-  yield(yields: Yield[]): Yield[];
+  yields(): Yield[];
 }
 export default Spaceship;

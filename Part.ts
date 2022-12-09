@@ -5,12 +5,12 @@ import {
 import Buildable from '@civ-clone/core-city-build/Buildable';
 import City from '@civ-clone/core-city/City';
 import { IDataObject } from '@civ-clone/core-data-object/DataObject';
+import PartYield from './Rules/Yield';
 import Yield from '@civ-clone/core-yield/Yield';
-import YieldRule from './Rules/Yield';
 
 export interface IPart extends IDataObject {
   city(): City;
-  yield(yields: Yield[]): Yield[];
+  yields(): Yield[];
 }
 
 export class Part extends Buildable implements IPart {
@@ -23,7 +23,7 @@ export class Part extends Buildable implements IPart {
     this.#city = city;
     this.#ruleRegistry = ruleRegistry;
 
-    this.addKey('city');
+    this.addKey('city', 'yields');
   }
 
   public static build(
@@ -37,16 +37,8 @@ export class Part extends Buildable implements IPart {
     return this.#city;
   }
 
-  yield(yields: Yield[]): Yield[] {
-    const rules = this.#ruleRegistry.get(YieldRule);
-
-    yields.forEach((partYield: Yield): void =>
-      rules
-        .filter((rule: YieldRule): boolean => rule.validate(this, partYield))
-        .forEach((rule: YieldRule): any => rule.process(this, partYield))
-    );
-
-    return yields;
+  yields(): Yield[] {
+    return this.#ruleRegistry.process(PartYield, this).flat();
   }
 }
 

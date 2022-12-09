@@ -23,7 +23,7 @@ class Part extends Buildable_1.default {
         _Part_ruleRegistry.set(this, void 0);
         __classPrivateFieldSet(this, _Part_city, city, "f");
         __classPrivateFieldSet(this, _Part_ruleRegistry, ruleRegistry, "f");
-        this.addKey('city');
+        this.addKey('city', 'yields');
     }
     static build(city, ruleRegistry = RuleRegistry_1.instance) {
         return new this(city, ruleRegistry);
@@ -31,12 +31,8 @@ class Part extends Buildable_1.default {
     city() {
         return __classPrivateFieldGet(this, _Part_city, "f");
     }
-    yield(yields) {
-        const rules = __classPrivateFieldGet(this, _Part_ruleRegistry, "f").get(Yield_1.default);
-        yields.forEach((partYield) => rules
-            .filter((rule) => rule.validate(this, partYield))
-            .forEach((rule) => rule.process(this, partYield)));
-        return yields;
+    yields() {
+        return __classPrivateFieldGet(this, _Part_ruleRegistry, "f").process(Yield_1.default, this).flat();
     }
 }
 exports.Part = Part;
