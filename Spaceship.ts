@@ -10,23 +10,27 @@ import {
   Turn,
   instance as turnInstance,
 } from '@civ-clone/core-turn-based-game/Turn';
+import Built from './Rules/Built';
 import ChanceOfSuccess from './Rules/ChanceOfSuccess';
+import ChooseSlot from './Rules/ChooseSlot';
 import FlightTime from './Rules/FlightTime';
 import Landed from './Rules/Landed';
 import Launch from './Rules/Launch';
+import Layout from './Layout';
 import Lost from './Rules/Lost';
 import Part from './Part';
-import Built from './Rules/Built';
 import Player from '@civ-clone/core-player/Player';
+import Slot from './Slot';
 import Yield from '@civ-clone/core-yield/Yield';
-import Validate from './Rules/Validate';
 
 export interface ISpaceship extends IDataObject {
   add(part: Part): void;
+  chanceOfSuccess(): number;
   check(): void;
   flightTime(): number;
   launch(): void;
   launched(): false | number;
+  layout(): Layout;
   parts(): Part[];
   player(): Player;
   successful(): boolean | null;
@@ -35,7 +39,7 @@ export interface ISpaceship extends IDataObject {
 
 export class Spaceship extends DataObject implements ISpaceship {
   #launched: false | number = false;
-  #parts: Part[] = [];
+  #layout: Layout;
   #player: Player;
   #randomNumberGenerator: () => number;
   #ruleRegistry: RuleRegistry;
@@ -44,6 +48,7 @@ export class Spaceship extends DataObject implements ISpaceship {
 
   constructor(
     player: Player,
+    layout: Layout,
     ruleRegistry: RuleRegistry = ruleRegistryInstance,
     turn: Turn = turnInstance,
     randomNumberGenerator: () => number = () => Math.random()
@@ -51,11 +56,13 @@ export class Spaceship extends DataObject implements ISpaceship {
     super();
 
     this.#player = player;
+    this.#layout = layout;
     this.#ruleRegistry = ruleRegistry;
     this.#turn = turn;
     this.#randomNumberGenerator = randomNumberGenerator;
 
     this.addKey(
+      'chanceOfSuccess',
       'flightTime',
       'launched',
       'parts',
@@ -66,17 +73,18 @@ export class Spaceship extends DataObject implements ISpaceship {
   }
 
   add(part: Part): void {
-    if (
-      this.#launched ||
-      !this.#ruleRegistry
-        .process(Validate, part, this)
-        .every((result) => result)
-    ) {
+    const [slot] = this.#ruleRegistry.process(ChooseSlot, part, this.#layout);
+
+    if (!slot) {
       return;
     }
 
-    this.#parts.push(part);
+    slot.fill(part);
     this.#ruleRegistry.process(Built, part, this);
+  }
+
+  chanceOfSuccess(): number {
+    return Math.max(...this.#ruleRegistry.process(ChanceOfSuccess, this), 0);
   }
 
   check(): void {
@@ -88,12 +96,7 @@ export class Spaceship extends DataObject implements ISpaceship {
       return;
     }
 
-    const chanceOfSuccess = Math.max(
-      ...this.#ruleRegistry.process(ChanceOfSuccess, this),
-      0
-    );
-
-    this.#successful = chanceOfSuccess > this.#randomNumberGenerator();
+    this.#successful = this.chanceOfSuccess() > this.#randomNumberGenerator();
 
     if (this.#successful) {
       this.#ruleRegistry.process(Landed, this);
@@ -121,8 +124,15 @@ export class Spaceship extends DataObject implements ISpaceship {
     return this.#launched;
   }
 
+  layout(): Layout {
+    return this.#layout;
+  }
+
   parts(): Part[] {
-    return this.#parts;
+    return this.#layout
+      .slots()
+      .filter((slot: Slot) => !slot.empty())
+      .map((slot: Slot) => slot.part()!);
   }
 
   player(): Player {
@@ -134,7 +144,7 @@ export class Spaceship extends DataObject implements ISpaceship {
   }
 
   yields(): Yield[] {
-    return this.#parts.flatMap((part: Part) => part.yields());
+    return this.parts().flatMap((part: Part) => part.yields());
   }
 }
 
