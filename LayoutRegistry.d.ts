@@ -1,6 +1,6 @@
-import EntityRegistry from '@civ-clone/core-registry/EntityRegistry';
+import ConstructorRegistry from '@civ-clone/core-registry/ConstructorRegistry';
 import Layout from './Layout';
-export declare class LayoutRegistry extends EntityRegistry<Layout> {
+export declare class LayoutRegistry extends ConstructorRegistry<Layout> {
   constructor();
 }
 export declare const instance: LayoutRegistry;

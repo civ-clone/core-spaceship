@@ -1,7 +1,7 @@
-import EntityRegistry from '@civ-clone/core-registry/EntityRegistry';
+import ConstructorRegistry from '@civ-clone/core-registry/ConstructorRegistry';
 import Layout from './Layout';
 
-export class LayoutRegistry extends EntityRegistry<Layout> {
+export class LayoutRegistry extends ConstructorRegistry<Layout> {
   constructor() {
     super(Layout);
   }

@@ -18,11 +18,11 @@ const RuleRegistry_1 = require("@civ-clone/core-rule/RuleRegistry");
 const Turn_1 = require("@civ-clone/core-turn-based-game/Turn");
 const Built_1 = require("./Rules/Built");
 const ChanceOfSuccess_1 = require("./Rules/ChanceOfSuccess");
+const ChooseSlot_1 = require("./Rules/ChooseSlot");
 const FlightTime_1 = require("./Rules/FlightTime");
 const Landed_1 = require("./Rules/Landed");
 const Launch_1 = require("./Rules/Launch");
 const Lost_1 = require("./Rules/Lost");
-const ChooseSlot_1 = require("./Rules/ChooseSlot");
 class Spaceship extends DataObject_1.DataObject {
     constructor(player, layout, ruleRegistry = RuleRegistry_1.instance, turn = Turn_1.instance, randomNumberGenerator = () => Math.random()) {
         super();
