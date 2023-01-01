@@ -65,6 +65,7 @@ export class Spaceship extends DataObject implements ISpaceship {
       'chanceOfSuccess',
       'flightTime',
       'launched',
+      'layout',
       'parts',
       'player',
       'successful',

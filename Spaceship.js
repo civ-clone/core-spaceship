@@ -38,7 +38,7 @@ class Spaceship extends DataObject_1.DataObject {
         __classPrivateFieldSet(this, _Spaceship_ruleRegistry, ruleRegistry, "f");
         __classPrivateFieldSet(this, _Spaceship_turn, turn, "f");
         __classPrivateFieldSet(this, _Spaceship_randomNumberGenerator, randomNumberGenerator, "f");
-        this.addKey('chanceOfSuccess', 'flightTime', 'launched', 'parts', 'player', 'successful', 'yields');
+        this.addKey('chanceOfSuccess', 'flightTime', 'launched', 'layout', 'parts', 'player', 'successful', 'yields');
     }
     add(part) {
         const [slot] = __classPrivateFieldGet(this, _Spaceship_ruleRegistry, "f").process(ChooseSlot_1.default, part, __classPrivateFieldGet(this, _Spaceship_layout, "f"));
