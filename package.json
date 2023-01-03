@@ -1,6 +1,7 @@
 {
   "name": "@civ-clone/core-spaceship",
-  "version": "0.1.3",
+  "version": "0.1.4",
+  "main": "index.js",
   "repository": "git@github.com:civ-clone/core-spaceship.git",
   "keywords": [
     "typescript",
