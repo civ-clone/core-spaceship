@@ -38,7 +38,13 @@ class Spaceship extends DataObject_1.DataObject {
         __classPrivateFieldSet(this, _Spaceship_ruleRegistry, ruleRegistry, "f");
         __classPrivateFieldSet(this, _Spaceship_turn, turn, "f");
         __classPrivateFieldSet(this, _Spaceship_randomNumberGenerator, randomNumberGenerator, "f");
-        this.addKey('chanceOfSuccess', 'flightTime', 'launched', 'layout', 'parts', 'player', 'successful', 'yields');
+        this.addKey('activeParts', 'chanceOfSuccess', 'flightTime', 'inactiveParts', 'launched', 'layout', 'player', 'successful', 'yields');
+    }
+    activeParts() {
+        return __classPrivateFieldGet(this, _Spaceship_layout, "f")
+            .activeSlots()
+            .filter((slot) => !slot.empty())
+            .map((slot) => slot.part());
     }
     add(part) {
         const [slot] = __classPrivateFieldGet(this, _Spaceship_ruleRegistry, "f").process(ChooseSlot_1.default, part, __classPrivateFieldGet(this, _Spaceship_layout, "f"));
@@ -70,6 +76,12 @@ class Spaceship extends DataObject_1.DataObject {
     flightTime() {
         return Math.min(...__classPrivateFieldGet(this, _Spaceship_ruleRegistry, "f").process(FlightTime_1.default, this), Infinity);
     }
+    inactiveParts() {
+        return __classPrivateFieldGet(this, _Spaceship_layout, "f")
+            .inactiveSlots()
+            .filter((slot) => !slot.empty())
+            .map((slot) => slot.part());
+    }
     launch() {
         __classPrivateFieldGet(this, _Spaceship_ruleRegistry, "f").process(Launch_1.default, this);
         __classPrivateFieldSet(this, _Spaceship_launched, __classPrivateFieldGet(this, _Spaceship_turn, "f").value(), "f");
@@ -80,12 +92,6 @@ class Spaceship extends DataObject_1.DataObject {
     layout() {
         return __classPrivateFieldGet(this, _Spaceship_layout, "f");
     }
-    parts() {
-        return __classPrivateFieldGet(this, _Spaceship_layout, "f")
-            .slots()
-            .filter((slot) => !slot.empty())
-            .map((slot) => slot.part());
-    }
     player() {
         return __classPrivateFieldGet(this, _Spaceship_player, "f");
     }
@@ -93,7 +99,7 @@ class Spaceship extends DataObject_1.DataObject {
         return __classPrivateFieldGet(this, _Spaceship_successful, "f");
     }
     yields() {
-        return this.parts().flatMap((part) => part.yields());
+        return this.activeParts().flatMap((part) => part.yields());
     }
 }
 exports.Spaceship = Spaceship;

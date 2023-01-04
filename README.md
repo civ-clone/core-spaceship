@@ -7,6 +7,7 @@ A `Spaceship` is built using `Layout` which consists of `Slot`s and is chosen fr
 
 ## Rules
 
+- `Active` - confirms whether a `Slot` is active.
 - `Built` - triggered when a `Part` is built.
 - `ChanceOfSuccess` - returns a value between `0` and `1`.
 - `ChooseSlot` - picks the preferred `Slot` for the `Part`.
@@ -14,5 +15,4 @@ A `Spaceship` is built using `Layout` which consists of `Slot`s and is chosen fr
 - `Landed` - triggered when the `Spaceship` successfully lands at its destination.
 - `Launch` - triggered when the `Spaceship` is launched.
 - `Lost` - triggered when the `Spaceship` doesn't reach its final destination.
-- `Validate` - confirms whether a `Part` is valid in its current placement.
 - `Yield` - used to calculate the associated `Yield`s from each `Part` (`Mass`, `Fuel`, `Population`, etc).

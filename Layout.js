@@ -10,38 +10,42 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
     if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
     return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
 };
-var _Layout_height, _Layout_ruleRegistry, _Layout_slots, _Layout_width;
+var _Layout_cachedSearch, _Layout_height, _Layout_ruleRegistry, _Layout_slots, _Layout_width;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Layout = void 0;
 const DataObject_1 = require("@civ-clone/core-data-object/DataObject");
 const RuleRegistry_1 = require("@civ-clone/core-rule/RuleRegistry");
 const ChooseSlot_1 = require("./Rules/ChooseSlot");
-const cachedSearch = new Map();
+const Active_1 = require("./Rules/Active");
 const isBetween = (n, x, y) => x <= n && n < y;
 class Layout extends DataObject_1.DataObject {
     constructor(height, width, slots, ruleRegistry = RuleRegistry_1.instance) {
         super();
+        _Layout_cachedSearch.set(this, new Map());
         _Layout_height.set(this, void 0);
         _Layout_ruleRegistry.set(this, void 0);
         _Layout_slots.set(this, []);
         _Layout_width.set(this, void 0);
-        this.addKey('height', 'slots', 'width');
+        this.addKey('activeSlots', 'height', 'inactiveSlots', 'slots', 'width');
         __classPrivateFieldSet(this, _Layout_height, height, "f");
         __classPrivateFieldSet(this, _Layout_ruleRegistry, ruleRegistry, "f");
         __classPrivateFieldSet(this, _Layout_width, width, "f");
         __classPrivateFieldGet(this, _Layout_slots, "f").push(...slots);
+    }
+    activeSlots() {
+        return __classPrivateFieldGet(this, _Layout_slots, "f").filter((slot) => __classPrivateFieldGet(this, _Layout_ruleRegistry, "f").process(Active_1.default, slot, this).every((result) => result));
     }
     get(x, y) {
         if (x < 0 || x >= __classPrivateFieldGet(this, _Layout_width, "f") || y < 0 || y >= __classPrivateFieldGet(this, _Layout_height, "f")) {
             return null;
         }
         const key = [x, y].toString();
-        if (!cachedSearch.has(key)) {
+        if (!__classPrivateFieldGet(this, _Layout_cachedSearch, "f").has(key)) {
             const [slot] = __classPrivateFieldGet(this, _Layout_slots, "f").filter((slot) => isBetween(x, slot.x(), slot.x() + slot.width()) &&
                 isBetween(y, slot.y(), slot.y() + slot.height()));
-            cachedSearch.set(key, slot !== null && slot !== void 0 ? slot : null);
+            __classPrivateFieldGet(this, _Layout_cachedSearch, "f").set(key, slot !== null && slot !== void 0 ? slot : null);
         }
-        return cachedSearch.get(key);
+        return __classPrivateFieldGet(this, _Layout_cachedSearch, "f").get(key);
     }
     getAdjacent(slot) {
         const adjacentSlots = new Set();
@@ -63,7 +67,7 @@ class Layout extends DataObject_1.DataObject {
                 adjacentSlots.add(after);
             }
         }
-        return [...adjacentSlots.values()];
+        return [...adjacentSlots.values()].filter((adjacentSlot) => adjacentSlot !== slot);
     }
     getFreeSlot(part) {
         const [slot] = __classPrivateFieldGet(this, _Layout_ruleRegistry, "f").process(ChooseSlot_1.default, part, this);
@@ -71,6 +75,9 @@ class Layout extends DataObject_1.DataObject {
     }
     height() {
         return __classPrivateFieldGet(this, _Layout_height, "f");
+    }
+    inactiveSlots() {
+        return __classPrivateFieldGet(this, _Layout_slots, "f").filter((slot) => __classPrivateFieldGet(this, _Layout_ruleRegistry, "f").process(Active_1.default, slot, this).some((result) => !result));
     }
     slots() {
         return __classPrivateFieldGet(this, _Layout_slots, "f");
@@ -80,6 +87,6 @@ class Layout extends DataObject_1.DataObject {
     }
 }
 exports.Layout = Layout;
-_Layout_height = new WeakMap(), _Layout_ruleRegistry = new WeakMap(), _Layout_slots = new WeakMap(), _Layout_width = new WeakMap();
+_Layout_cachedSearch = new WeakMap(), _Layout_height = new WeakMap(), _Layout_ruleRegistry = new WeakMap(), _Layout_slots = new WeakMap(), _Layout_width = new WeakMap();
 exports.default = Layout;
 //# sourceMappingURL=Layout.js.map

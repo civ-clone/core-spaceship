@@ -24,14 +24,15 @@ import Slot from './Slot';
 import Yield from '@civ-clone/core-yield/Yield';
 
 export interface ISpaceship extends IDataObject {
+  activeParts(): Part[];
   add(part: Part): void;
   chanceOfSuccess(): number;
   check(): void;
   flightTime(): number;
+  inactiveParts(): Part[];
   launch(): void;
   launched(): false | number;
   layout(): Layout;
-  parts(): Part[];
   player(): Player;
   successful(): boolean | null;
   yields(): Yield[];
@@ -62,15 +63,23 @@ export class Spaceship extends DataObject implements ISpaceship {
     this.#randomNumberGenerator = randomNumberGenerator;
 
     this.addKey(
+      'activeParts',
       'chanceOfSuccess',
       'flightTime',
+      'inactiveParts',
       'launched',
       'layout',
-      'parts',
       'player',
       'successful',
       'yields'
     );
+  }
+
+  activeParts(): Part[] {
+    return this.#layout
+      .activeSlots()
+      .filter((slot: Slot) => !slot.empty())
+      .map((slot: Slot) => slot.part()!);
   }
 
   add(part: Part): void {
@@ -115,6 +124,13 @@ export class Spaceship extends DataObject implements ISpaceship {
     return Math.min(...this.#ruleRegistry.process(FlightTime, this), Infinity);
   }
 
+  inactiveParts(): Part[] {
+    return this.#layout
+      .inactiveSlots()
+      .filter((slot: Slot) => !slot.empty())
+      .map((slot: Slot) => slot.part()!);
+  }
+
   launch(): void {
     this.#ruleRegistry.process(Launch, this);
 
@@ -129,13 +145,6 @@ export class Spaceship extends DataObject implements ISpaceship {
     return this.#layout;
   }
 
-  parts(): Part[] {
-    return this.#layout
-      .slots()
-      .filter((slot: Slot) => !slot.empty())
-      .map((slot: Slot) => slot.part()!);
-  }
-
   player(): Player {
     return this.#player;
   }
@@ -145,7 +154,7 @@ export class Spaceship extends DataObject implements ISpaceship {
   }
 
   yields(): Yield[] {
-    return this.parts().flatMap((part: Part) => part.yields());
+    return this.activeParts().flatMap((part: Part) => part.yields());
   }
 }
 

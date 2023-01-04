@@ -9,21 +9,23 @@ import {
 import ChooseSlot from './Rules/ChooseSlot';
 import Part from './Part';
 import Slot from './Slot';
-
-const cachedSearch = new Map<string, Slot>();
+import Active from './Rules/Active';
 
 const isBetween = (n: number, x: number, y: number): boolean => x <= n && n < y;
 
 export interface ILayout extends IDataObject {
+  activeSlots(): Slot[];
   get(x: number, y: number): Slot | null;
   getAdjacent(slot: Slot): Slot[];
   getFreeSlot(part: Part): Slot | null;
   height(): number;
+  inactiveSlots(): Slot[];
   slots(): Slot[];
   width(): number;
 }
 
 export class Layout extends DataObject implements ILayout {
+  #cachedSearch = new Map<string, Slot>();
   #height: number;
   #ruleRegistry: RuleRegistry;
   #slots: Slot[] = [];
@@ -37,13 +39,19 @@ export class Layout extends DataObject implements ILayout {
   ) {
     super();
 
-    this.addKey('height', 'slots', 'width');
+    this.addKey('activeSlots', 'height', 'inactiveSlots', 'slots', 'width');
 
     this.#height = height;
     this.#ruleRegistry = ruleRegistry;
     this.#width = width;
 
     this.#slots.push(...slots);
+  }
+
+  activeSlots(): Slot[] {
+    return this.#slots.filter((slot) =>
+      this.#ruleRegistry.process(Active, slot, this).every((result) => result)
+    );
   }
 
   get(x: number, y: number): Slot | null {
@@ -53,17 +61,17 @@ export class Layout extends DataObject implements ILayout {
 
     const key = [x, y].toString();
 
-    if (!cachedSearch.has(key)) {
+    if (!this.#cachedSearch.has(key)) {
       const [slot] = this.#slots.filter(
         (slot) =>
           isBetween(x, slot.x(), slot.x() + slot.width()) &&
           isBetween(y, slot.y(), slot.y() + slot.height())
       );
 
-      cachedSearch.set(key, slot ?? null);
+      this.#cachedSearch.set(key, slot ?? null);
     }
 
-    return cachedSearch.get(key)!;
+    return this.#cachedSearch.get(key)!;
   }
 
   getAdjacent(slot: Slot): Slot[] {
@@ -99,7 +107,9 @@ export class Layout extends DataObject implements ILayout {
       }
     }
 
-    return [...adjacentSlots.values()];
+    return [...adjacentSlots.values()].filter(
+      (adjacentSlot) => adjacentSlot !== slot
+    );
   }
 
   getFreeSlot(part: Part): Slot | null {
@@ -110,6 +120,12 @@ export class Layout extends DataObject implements ILayout {
 
   height(): number {
     return this.#height;
+  }
+
+  inactiveSlots(): Slot[] {
+    return this.#slots.filter((slot) =>
+      this.#ruleRegistry.process(Active, slot, this).some((result) => !result)
+    );
   }
 
   slots(): Slot[] {
