@@ -20,7 +20,7 @@ export declare class Slot extends DataObject implements ISlot {
     y: number,
     height: number,
     width: number,
-    accepts: typeof Part[]
+    accepts: (typeof Part)[]
   );
   accepts(part: Part): boolean;
   empty(): boolean;

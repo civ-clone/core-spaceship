@@ -16,7 +16,7 @@ export interface ISlot extends IDataObject {
 }
 
 export class Slot extends DataObject implements ISlot {
-  #accepts: typeof Part[] = [];
+  #accepts: (typeof Part)[] = [];
   #height: number;
   #part: Part | null = null;
   #width: number;
@@ -28,7 +28,7 @@ export class Slot extends DataObject implements ISlot {
     y: number,
     height: number,
     width: number,
-    accepts: typeof Part[]
+    accepts: (typeof Part)[]
   ) {
     super();
 

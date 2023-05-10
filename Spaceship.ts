@@ -10,6 +10,7 @@ import {
   Turn,
   instance as turnInstance,
 } from '@civ-clone/core-turn-based-game/Turn';
+import { Year, instance as yearInstance } from '@civ-clone/core-game-year/Year';
 import Built from './Rules/Built';
 import ChanceOfSuccess from './Rules/ChanceOfSuccess';
 import ChooseSlot from './Rules/ChooseSlot';
@@ -39,6 +40,7 @@ export interface ISpaceship extends IDataObject {
 }
 
 export class Spaceship extends DataObject implements ISpaceship {
+  #landingTurn: number = Infinity;
   #launched: false | number = false;
   #layout: Layout;
   #player: Player;
@@ -46,12 +48,14 @@ export class Spaceship extends DataObject implements ISpaceship {
   #ruleRegistry: RuleRegistry;
   #successful: boolean | null = null;
   #turn: Turn;
+  #year: Year;
 
   constructor(
     player: Player,
     layout: Layout,
     ruleRegistry: RuleRegistry = ruleRegistryInstance,
     turn: Turn = turnInstance,
+    year: Year = yearInstance,
     randomNumberGenerator: () => number = () => Math.random()
   ) {
     super();
@@ -60,6 +64,7 @@ export class Spaceship extends DataObject implements ISpaceship {
     this.#layout = layout;
     this.#ruleRegistry = ruleRegistry;
     this.#turn = turn;
+    this.#year = year;
     this.#randomNumberGenerator = randomNumberGenerator;
 
     this.addKey(
@@ -101,7 +106,7 @@ export class Spaceship extends DataObject implements ISpaceship {
     if (
       this.#successful !== null ||
       this.#launched === false ||
-      this.#launched + this.flightTime() < this.#turn.value()
+      this.#turn.value() < this.#landingTurn
     ) {
       return;
     }
@@ -118,7 +123,7 @@ export class Spaceship extends DataObject implements ISpaceship {
   }
 
   /**
-   * Returns the number of turns the flight is estimated to take.
+   * Returns the number of years the flight is estimated to take.
    */
   flightTime(): number {
     return Math.min(...this.#ruleRegistry.process(FlightTime, this), Infinity);
@@ -134,7 +139,15 @@ export class Spaceship extends DataObject implements ISpaceship {
   launch(): void {
     this.#ruleRegistry.process(Launch, this);
 
-    this.#launched = this.#turn.value();
+    this.#landingTurn = this.#launched = this.#turn.value();
+
+    const years = this.flightTime(),
+      targetYear = this.#year.value() + years;
+
+    // convert to whole `Turn`s
+    while (this.#year.value(this.#landingTurn) < targetYear) {
+      this.#landingTurn++;
+    }
   }
 
   launched(): false | number {

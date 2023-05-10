@@ -11,7 +11,7 @@ A `Spaceship` is built using `Layout` which consists of `Slot`s and is chosen fr
 - `Built` - triggered when a `Part` is built.
 - `ChanceOfSuccess` - returns a value between `0` and `1`.
 - `ChooseSlot` - picks the preferred `Slot` for the `Part`.
-- `FlightTime` - returns the estimated number of `Turn`s the flight will take.
+- `FlightTime` - returns the number of `Year`s the flight will take.
 - `Landed` - triggered when the `Spaceship` successfully lands at its destination.
 - `Launch` - triggered when the `Spaceship` is launched.
 - `Lost` - triggered when the `Spaceship` doesn't reach its final destination.

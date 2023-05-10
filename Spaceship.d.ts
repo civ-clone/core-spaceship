@@ -4,6 +4,7 @@ import {
 } from '@civ-clone/core-data-object/DataObject';
 import { RuleRegistry } from '@civ-clone/core-rule/RuleRegistry';
 import { Turn } from '@civ-clone/core-turn-based-game/Turn';
+import { Year } from '@civ-clone/core-game-year/Year';
 import Layout from './Layout';
 import Part from './Part';
 import Player from '@civ-clone/core-player/Player';
@@ -29,6 +30,7 @@ export declare class Spaceship extends DataObject implements ISpaceship {
     layout: Layout,
     ruleRegistry?: RuleRegistry,
     turn?: Turn,
+    year?: Year,
     randomNumberGenerator?: () => number
   );
   activeParts(): Part[];
@@ -36,7 +38,7 @@ export declare class Spaceship extends DataObject implements ISpaceship {
   chanceOfSuccess(): number;
   check(): void;
   /**
-   * Returns the number of turns the flight is estimated to take.
+   * Returns the number of years the flight is estimated to take.
    */
   flightTime(): number;
   inactiveParts(): Part[];
