@@ -14,14 +14,14 @@ export interface IPart extends IDataObject {
 }
 
 export class Part extends Buildable implements IPart {
-  #city: City;
-  #ruleRegistry: RuleRegistry;
+  private _city: City;
+  private _ruleRegistry: RuleRegistry;
 
   constructor(city: City, ruleRegistry: RuleRegistry = ruleRegistryInstance) {
     super();
 
-    this.#city = city;
-    this.#ruleRegistry = ruleRegistry;
+    this._city = city;
+    this._ruleRegistry = ruleRegistry;
 
     this.addKey('city', 'yields');
   }
@@ -34,11 +34,11 @@ export class Part extends Buildable implements IPart {
   }
 
   city(): City {
-    return this.#city;
+    return this._city;
   }
 
   yields(): Yield[] {
-    return this.#ruleRegistry.process(PartYield, this).flat();
+    return this._ruleRegistry.process(PartYield, this).flat();
   }
 }
 

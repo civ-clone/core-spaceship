@@ -25,11 +25,11 @@ export interface ILayout extends IDataObject {
 }
 
 export class Layout extends DataObject implements ILayout {
-  #cachedSearch = new Map<string, Slot>();
-  #height: number;
-  #ruleRegistry: RuleRegistry;
-  #slots: Slot[] = [];
-  #width: number;
+  private _cachedSearch = new Map<string, Slot>();
+  private _height: number;
+  private _ruleRegistry: RuleRegistry;
+  private _slots: Slot[] = [];
+  private _width: number;
 
   constructor(
     height: number,
@@ -41,37 +41,37 @@ export class Layout extends DataObject implements ILayout {
 
     this.addKey('activeSlots', 'height', 'inactiveSlots', 'slots', 'width');
 
-    this.#height = height;
-    this.#ruleRegistry = ruleRegistry;
-    this.#width = width;
+    this._height = height;
+    this._ruleRegistry = ruleRegistry;
+    this._width = width;
 
-    this.#slots.push(...slots);
+    this._slots.push(...slots);
   }
 
   activeSlots(): Slot[] {
-    return this.#slots.filter((slot) =>
-      this.#ruleRegistry.process(Active, slot, this).every((result) => result)
+    return this._slots.filter((slot) =>
+      this._ruleRegistry.process(Active, slot, this).every((result) => result)
     );
   }
 
   get(x: number, y: number): Slot | null {
-    if (x < 0 || x >= this.#width || y < 0 || y >= this.#height) {
+    if (x < 0 || x >= this._width || y < 0 || y >= this._height) {
       return null;
     }
 
     const key = [x, y].toString();
 
-    if (!this.#cachedSearch.has(key)) {
-      const [slot] = this.#slots.filter(
+    if (!this._cachedSearch.has(key)) {
+      const [slot] = this._slots.filter(
         (slot) =>
           isBetween(x, slot.x(), slot.x() + slot.width()) &&
           isBetween(y, slot.y(), slot.y() + slot.height())
       );
 
-      this.#cachedSearch.set(key, slot ?? null);
+      this._cachedSearch.set(key, slot ?? null);
     }
 
-    return this.#cachedSearch.get(key)!;
+    return this._cachedSearch.get(key)!;
   }
 
   getAdjacent(slot: Slot): Slot[] {
@@ -113,27 +113,27 @@ export class Layout extends DataObject implements ILayout {
   }
 
   getFreeSlot(part: Part): Slot | null {
-    const [slot] = this.#ruleRegistry.process(ChooseSlot, part, this);
+    const [slot] = this._ruleRegistry.process(ChooseSlot, part, this);
 
     return slot ?? null;
   }
 
   height(): number {
-    return this.#height;
+    return this._height;
   }
 
   inactiveSlots(): Slot[] {
-    return this.#slots.filter((slot) =>
-      this.#ruleRegistry.process(Active, slot, this).some((result) => !result)
+    return this._slots.filter((slot) =>
+      this._ruleRegistry.process(Active, slot, this).some((result) => !result)
     );
   }
 
   slots(): Slot[] {
-    return this.#slots;
+    return this._slots;
   }
 
   width(): number {
-    return this.#width;
+    return this._width;
   }
 }
 

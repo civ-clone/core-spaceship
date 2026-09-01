@@ -16,7 +16,11 @@ export interface ILayout extends IDataObject {
   width(): number;
 }
 export declare class Layout extends DataObject implements ILayout {
-  #private;
+  private _cachedSearch;
+  private _height;
+  private _ruleRegistry;
+  private _slots;
+  private _width;
   constructor(
     height: number,
     width: number,

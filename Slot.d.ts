@@ -14,7 +14,12 @@ export interface ISlot extends IDataObject {
   y(): number;
 }
 export declare class Slot extends DataObject implements ISlot {
-  #private;
+  private _accepts;
+  private _height;
+  private _part;
+  private _width;
+  private _x;
+  private _y;
   constructor(
     x: number,
     y: number,

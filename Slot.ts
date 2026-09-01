@@ -16,12 +16,12 @@ export interface ISlot extends IDataObject {
 }
 
 export class Slot extends DataObject implements ISlot {
-  #accepts: (typeof Part)[] = [];
-  #height: number;
-  #part: Part | null = null;
-  #width: number;
-  #x: number;
-  #y: number;
+  private _accepts: (typeof Part)[] = [];
+  private _height: number;
+  private _part: Part | null = null;
+  private _width: number;
+  private _x: number;
+  private _y: number;
 
   constructor(
     x: number,
@@ -34,21 +34,21 @@ export class Slot extends DataObject implements ISlot {
 
     this.addKey('height', 'part', 'width', 'x', 'y');
 
-    this.#height = height;
-    this.#width = width;
-    this.#x = x;
-    this.#y = y;
-    this.#accepts.push(...accepts);
+    this._height = height;
+    this._width = width;
+    this._x = x;
+    this._y = y;
+    this._accepts.push(...accepts);
   }
 
   accepts(part: Part): boolean {
-    return this.#accepts.some(
+    return this._accepts.some(
       (PartType: typeof Part) => part instanceof PartType
     );
   }
 
   empty(): boolean {
-    return this.#part === null;
+    return this._part === null;
   }
 
   fill(part: Part): void {
@@ -56,27 +56,27 @@ export class Slot extends DataObject implements ISlot {
       return;
     }
 
-    this.#part = part;
+    this._part = part;
   }
 
   height(): number {
-    return this.#height;
+    return this._height;
   }
 
   part(): Part | null {
-    return this.#part;
+    return this._part;
   }
 
   width(): number {
-    return this.#width;
+    return this._width;
   }
 
   x(): number {
-    return this.#x;
+    return this._x;
   }
 
   y(): number {
-    return this.#y;
+    return this._y;
   }
 }
 

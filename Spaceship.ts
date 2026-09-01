@@ -40,15 +40,15 @@ export interface ISpaceship extends IDataObject {
 }
 
 export class Spaceship extends DataObject implements ISpaceship {
-  #landingTurn: number = Infinity;
-  #launched: false | number = false;
-  #layout: Layout;
-  #player: Player;
-  #randomNumberGenerator: () => number;
-  #ruleRegistry: RuleRegistry;
-  #successful: boolean | null = null;
-  #turn: Turn;
-  #year: Year;
+  private _landingTurn: number = Infinity;
+  private _launched: false | number = false;
+  private _layout: Layout;
+  private _player: Player;
+  private _randomNumberGenerator: () => number;
+  private _ruleRegistry: RuleRegistry;
+  private _successful: boolean | null = null;
+  private _turn: Turn;
+  private _year: Year;
 
   constructor(
     player: Player,
@@ -60,12 +60,12 @@ export class Spaceship extends DataObject implements ISpaceship {
   ) {
     super();
 
-    this.#player = player;
-    this.#layout = layout;
-    this.#ruleRegistry = ruleRegistry;
-    this.#turn = turn;
-    this.#year = year;
-    this.#randomNumberGenerator = randomNumberGenerator;
+    this._player = player;
+    this._layout = layout;
+    this._ruleRegistry = ruleRegistry;
+    this._turn = turn;
+    this._year = year;
+    this._randomNumberGenerator = randomNumberGenerator;
 
     this.addKey(
       'activeParts',
@@ -81,89 +81,89 @@ export class Spaceship extends DataObject implements ISpaceship {
   }
 
   activeParts(): Part[] {
-    return this.#layout
+    return this._layout
       .activeSlots()
       .filter((slot: Slot) => !slot.empty())
       .map((slot: Slot) => slot.part()!);
   }
 
   add(part: Part): void {
-    const [slot] = this.#ruleRegistry.process(ChooseSlot, part, this.#layout);
+    const [slot] = this._ruleRegistry.process(ChooseSlot, part, this._layout);
 
     if (!slot) {
       return;
     }
 
     slot.fill(part);
-    this.#ruleRegistry.process(Built, part, this);
+    this._ruleRegistry.process(Built, part, this);
   }
 
   chanceOfSuccess(): number {
-    return Math.max(...this.#ruleRegistry.process(ChanceOfSuccess, this), 0);
+    return Math.max(...this._ruleRegistry.process(ChanceOfSuccess, this), 0);
   }
 
   check(): void {
     if (
-      this.#successful !== null ||
-      this.#launched === false ||
-      this.#turn.value() < this.#landingTurn
+      this._successful !== null ||
+      this._launched === false ||
+      this._turn.value() < this._landingTurn
     ) {
       return;
     }
 
-    this.#successful = this.chanceOfSuccess() > this.#randomNumberGenerator();
+    this._successful = this.chanceOfSuccess() > this._randomNumberGenerator();
 
-    if (this.#successful) {
-      this.#ruleRegistry.process(Landed, this);
+    if (this._successful) {
+      this._ruleRegistry.process(Landed, this);
 
       return;
     }
 
-    this.#ruleRegistry.process(Lost, this);
+    this._ruleRegistry.process(Lost, this);
   }
 
   /**
    * Returns the number of years the flight is estimated to take.
    */
   flightTime(): number {
-    return Math.min(...this.#ruleRegistry.process(FlightTime, this), Infinity);
+    return Math.min(...this._ruleRegistry.process(FlightTime, this), Infinity);
   }
 
   inactiveParts(): Part[] {
-    return this.#layout
+    return this._layout
       .inactiveSlots()
       .filter((slot: Slot) => !slot.empty())
       .map((slot: Slot) => slot.part()!);
   }
 
   launch(): void {
-    this.#ruleRegistry.process(Launch, this);
+    this._ruleRegistry.process(Launch, this);
 
-    this.#landingTurn = this.#launched = this.#turn.value();
+    this._landingTurn = this._launched = this._turn.value();
 
     const years = this.flightTime(),
-      targetYear = this.#year.value() + years;
+      targetYear = this._year.value() + years;
 
     // convert to whole `Turn`s
-    while (this.#year.value(this.#landingTurn) < targetYear) {
-      this.#landingTurn++;
+    while (this._year.value(this._landingTurn) < targetYear) {
+      this._landingTurn++;
     }
   }
 
   launched(): false | number {
-    return this.#launched;
+    return this._launched;
   }
 
   layout(): Layout {
-    return this.#layout;
+    return this._layout;
   }
 
   player(): Player {
-    return this.#player;
+    return this._player;
   }
 
   successful(): boolean | null {
-    return this.#successful;
+    return this._successful;
   }
 
   yields(): Yield[] {

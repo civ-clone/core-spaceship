@@ -24,7 +24,15 @@ export interface ISpaceship extends IDataObject {
   yields(): Yield[];
 }
 export declare class Spaceship extends DataObject implements ISpaceship {
-  #private;
+  private _landingTurn;
+  private _launched;
+  private _layout;
+  private _player;
+  private _randomNumberGenerator;
+  private _ruleRegistry;
+  private _successful;
+  private _turn;
+  private _year;
   constructor(
     player: Player,
     layout: Layout,
