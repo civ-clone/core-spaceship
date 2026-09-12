@@ -12,8 +12,9 @@ const FlightTime_1 = require("./Rules/FlightTime");
 const Landed_1 = require("./Rules/Landed");
 const Launch_1 = require("./Rules/Launch");
 const Lost_1 = require("./Rules/Lost");
+const core_random_1 = require("@civ-clone/core-random");
 class Spaceship extends DataObject_1.DataObject {
-    constructor(player, layout, ruleRegistry = RuleRegistry_1.instance, turn = Turn_1.instance, year = Year_1.instance, randomNumberGenerator = () => Math.random()) {
+    constructor(player, layout, ruleRegistry = RuleRegistry_1.instance, turn = Turn_1.instance, year = Year_1.instance, randomNumberGenerator = core_random_1.instance) {
         super();
         this._landingTurn = Infinity;
         this._launched = false;

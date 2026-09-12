@@ -23,6 +23,7 @@ import Part from './Part';
 import Player from '@civ-clone/core-player/Player';
 import Slot from './Slot';
 import Yield from '@civ-clone/core-yield/Yield';
+import { instance as rngInstance } from '@civ-clone/core-random';
 
 export interface ISpaceship extends IDataObject {
   activeParts(): Part[];
@@ -56,7 +57,7 @@ export class Spaceship extends DataObject implements ISpaceship {
     ruleRegistry: RuleRegistry = ruleRegistryInstance,
     turn: Turn = turnInstance,
     year: Year = yearInstance,
-    randomNumberGenerator: () => number = () => Math.random()
+    randomNumberGenerator: () => number = rngInstance
   ) {
     super();
 
