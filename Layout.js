@@ -72,5 +72,6 @@ class Layout extends DataObject_1.DataObject {
     }
 }
 exports.Layout = Layout;
+Layout.transient = ['_cachedSearch', '_ruleRegistry'];
 exports.default = Layout;
 //# sourceMappingURL=Layout.js.map

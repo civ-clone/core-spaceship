@@ -95,5 +95,11 @@ class Spaceship extends DataObject_1.DataObject {
     }
 }
 exports.Spaceship = Spaceship;
+Spaceship.transient = [
+    '_randomNumberGenerator',
+    '_ruleRegistry',
+    '_turn',
+    '_year',
+];
 exports.default = Spaceship;
 //# sourceMappingURL=Spaceship.js.map

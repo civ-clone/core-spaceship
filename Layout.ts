@@ -25,6 +25,7 @@ export interface ILayout extends IDataObject {
 }
 
 export class Layout extends DataObject implements ILayout {
+  static readonly transient = ['_cachedSearch', '_ruleRegistry'];
   private _cachedSearch = new Map<string, Slot>();
   private _height: number;
   private _ruleRegistry: RuleRegistry;

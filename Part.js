@@ -22,5 +22,6 @@ class Part extends Buildable_1.default {
     }
 }
 exports.Part = Part;
+Part.transient = ['_ruleRegistry'];
 exports.default = Part;
 //# sourceMappingURL=Part.js.map

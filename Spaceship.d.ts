@@ -24,6 +24,7 @@ export interface ISpaceship extends IDataObject {
   yields(): Yield[];
 }
 export declare class Spaceship extends DataObject implements ISpaceship {
+  static readonly transient: string[];
   private _landingTurn;
   private _launched;
   private _layout;

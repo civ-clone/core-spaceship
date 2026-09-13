@@ -41,6 +41,12 @@ export interface ISpaceship extends IDataObject {
 }
 
 export class Spaceship extends DataObject implements ISpaceship {
+  static readonly transient = [
+    '_randomNumberGenerator',
+    '_ruleRegistry',
+    '_turn',
+    '_year',
+  ];
   private _landingTurn: number = Infinity;
   private _launched: false | number = false;
   private _layout: Layout;

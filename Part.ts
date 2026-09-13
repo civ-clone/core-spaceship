@@ -14,6 +14,7 @@ export interface IPart extends IDataObject {
 }
 
 export class Part extends Buildable implements IPart {
+  static readonly transient = ['_ruleRegistry'];
   private _city: City;
   private _ruleRegistry: RuleRegistry;
 

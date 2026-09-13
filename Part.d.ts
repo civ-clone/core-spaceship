@@ -8,6 +8,7 @@ export interface IPart extends IDataObject {
   yields(): Yield[];
 }
 export declare class Part extends Buildable implements IPart {
+  static readonly transient: string[];
   private _city;
   private _ruleRegistry;
   constructor(city: City, ruleRegistry?: RuleRegistry);

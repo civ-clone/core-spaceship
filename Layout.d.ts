@@ -16,6 +16,7 @@ export interface ILayout extends IDataObject {
   width(): number;
 }
 export declare class Layout extends DataObject implements ILayout {
+  static readonly transient: string[];
   private _cachedSearch;
   private _height;
   private _ruleRegistry;
