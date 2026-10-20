@@ -14,6 +14,7 @@ export interface ISpaceship extends IDataObject {
   add(part: Part): void;
   chanceOfSuccess(): number;
   check(): void;
+  lose(): void;
   flightTime(): number;
   inactiveParts(): Part[];
   launch(): void;
@@ -29,7 +30,6 @@ export declare class Spaceship extends DataObject implements ISpaceship {
   private _launched;
   private _layout;
   private _player;
-  private _randomNumberGenerator;
   private _ruleRegistry;
   private _successful;
   private _turn;
@@ -39,8 +39,7 @@ export declare class Spaceship extends DataObject implements ISpaceship {
     layout: Layout,
     ruleRegistry?: RuleRegistry,
     turn?: Turn,
-    year?: Year,
-    randomNumberGenerator?: () => number
+    year?: Year
   );
   activeParts(): Part[];
   add(part: Part): void;
@@ -51,6 +50,11 @@ export declare class Spaceship extends DataObject implements ISpaceship {
    */
   flightTime(): number;
   inactiveParts(): Part[];
+  /**
+   * The ship is lost: one being built is cancelled, and one in flight never arrives. Its owner losing their capital,
+   * say.
+   */
+  lose(): void;
   launch(): void;
   launched(): false | number;
   layout(): Layout;

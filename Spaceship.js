@@ -12,9 +12,8 @@ const FlightTime_1 = require("./Rules/FlightTime");
 const Landed_1 = require("./Rules/Landed");
 const Launch_1 = require("./Rules/Launch");
 const Lost_1 = require("./Rules/Lost");
-const core_random_1 = require("@civ-clone/core-random");
 class Spaceship extends DataObject_1.DataObject {
-    constructor(player, layout, ruleRegistry = RuleRegistry_1.instance, turn = Turn_1.instance, year = Year_1.instance, randomNumberGenerator = core_random_1.instance) {
+    constructor(player, layout, ruleRegistry = RuleRegistry_1.instance, turn = Turn_1.instance, year = Year_1.instance) {
         super();
         this._landingTurn = Infinity;
         this._launched = false;
@@ -24,7 +23,6 @@ class Spaceship extends DataObject_1.DataObject {
         this._ruleRegistry = ruleRegistry;
         this._turn = turn;
         this._year = year;
-        this._randomNumberGenerator = randomNumberGenerator;
         this.addKey('activeParts', 'chanceOfSuccess', 'flightTime', 'inactiveParts', 'launched', 'layout', 'player', 'successful', 'yields');
     }
     activeParts() {
@@ -50,12 +48,9 @@ class Spaceship extends DataObject_1.DataObject {
             this._turn.value() < this._landingTurn) {
             return;
         }
-        this._successful = this.chanceOfSuccess() > this._randomNumberGenerator();
-        if (this._successful) {
-            this._ruleRegistry.process(Landed_1.default, this);
-            return;
-        }
-        this._ruleRegistry.process(Lost_1.default, this);
+        // A ship that reaches its destination always lands. Its chance of success is only for a ruleset to score it by.
+        this._successful = true;
+        this._ruleRegistry.process(Landed_1.default, this);
     }
     /**
      * Returns the number of years the flight is estimated to take.
@@ -68,6 +63,17 @@ class Spaceship extends DataObject_1.DataObject {
             .inactiveSlots()
             .filter((slot) => !slot.empty())
             .map((slot) => slot.part());
+    }
+    /**
+     * The ship is lost: one being built is cancelled, and one in flight never arrives. Its owner losing their capital,
+     * say.
+     */
+    lose() {
+        if (this._successful !== null) {
+            return;
+        }
+        this._successful = false;
+        this._ruleRegistry.process(Lost_1.default, this);
     }
     launch() {
         this._ruleRegistry.process(Launch_1.default, this);
@@ -95,11 +101,6 @@ class Spaceship extends DataObject_1.DataObject {
     }
 }
 exports.Spaceship = Spaceship;
-Spaceship.transient = [
-    '_randomNumberGenerator',
-    '_ruleRegistry',
-    '_turn',
-    '_year',
-];
+Spaceship.transient = ['_ruleRegistry', '_turn', '_year'];
 exports.default = Spaceship;
 //# sourceMappingURL=Spaceship.js.map
