@@ -23,13 +23,13 @@ import Part from './Part';
 import Player from '@civ-clone/core-player/Player';
 import Slot from './Slot';
 import Yield from '@civ-clone/core-yield/Yield';
-import { instance as rngInstance } from '@civ-clone/core-random';
 
 export interface ISpaceship extends IDataObject {
   activeParts(): Part[];
   add(part: Part): void;
   chanceOfSuccess(): number;
   check(): void;
+  lose(): void;
   flightTime(): number;
   inactiveParts(): Part[];
   launch(): void;
@@ -41,17 +41,11 @@ export interface ISpaceship extends IDataObject {
 }
 
 export class Spaceship extends DataObject implements ISpaceship {
-  static readonly transient = [
-    '_randomNumberGenerator',
-    '_ruleRegistry',
-    '_turn',
-    '_year',
-  ];
+  static readonly transient = ['_ruleRegistry', '_turn', '_year'];
   private _landingTurn: number = Infinity;
   private _launched: false | number = false;
   private _layout: Layout;
   private _player: Player;
-  private _randomNumberGenerator: () => number;
   private _ruleRegistry: RuleRegistry;
   private _successful: boolean | null = null;
   private _turn: Turn;
@@ -62,8 +56,7 @@ export class Spaceship extends DataObject implements ISpaceship {
     layout: Layout,
     ruleRegistry: RuleRegistry = ruleRegistryInstance,
     turn: Turn = turnInstance,
-    year: Year = yearInstance,
-    randomNumberGenerator: () => number = rngInstance
+    year: Year = yearInstance
   ) {
     super();
 
@@ -72,7 +65,6 @@ export class Spaceship extends DataObject implements ISpaceship {
     this._ruleRegistry = ruleRegistry;
     this._turn = turn;
     this._year = year;
-    this._randomNumberGenerator = randomNumberGenerator;
 
     this.addKey(
       'activeParts',
@@ -118,15 +110,10 @@ export class Spaceship extends DataObject implements ISpaceship {
       return;
     }
 
-    this._successful = this.chanceOfSuccess() > this._randomNumberGenerator();
+    // A ship that reaches its destination always lands. Its chance of success is only for a ruleset to score it by.
+    this._successful = true;
 
-    if (this._successful) {
-      this._ruleRegistry.process(Landed, this);
-
-      return;
-    }
-
-    this._ruleRegistry.process(Lost, this);
+    this._ruleRegistry.process(Landed, this);
   }
 
   /**
@@ -141,6 +128,20 @@ export class Spaceship extends DataObject implements ISpaceship {
       .inactiveSlots()
       .filter((slot: Slot) => !slot.empty())
       .map((slot: Slot) => slot.part()!);
+  }
+
+  /**
+   * The ship is lost: one being built is cancelled, and one in flight never arrives. Its owner losing their capital,
+   * say.
+   */
+  lose(): void {
+    if (this._successful !== null) {
+      return;
+    }
+
+    this._successful = false;
+
+    this._ruleRegistry.process(Lost, this);
   }
 
   launch(): void {

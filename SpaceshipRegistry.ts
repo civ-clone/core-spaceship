@@ -18,9 +18,9 @@ export class SpaceshipRegistry
   }
 
   getActiveByPlayer(player: Player): Spaceship | null {
+    // Being built, or in flight: neither landed nor lost.
     const [spaceship] = this.getBy('player', player).filter(
-      (spaceship) =>
-        spaceship.launched() === false || spaceship.successful() === null
+      (spaceship) => spaceship.successful() === null
     );
 
     if (!spaceship) {

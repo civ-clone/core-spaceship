@@ -8,7 +8,8 @@ class SpaceshipRegistry extends EntityRegistry_1.EntityRegistry {
         super(Spaceship_1.default);
     }
     getActiveByPlayer(player) {
-        const [spaceship] = this.getBy('player', player).filter((spaceship) => spaceship.launched() === false || spaceship.successful() === null);
+        // Being built, or in flight: neither landed nor lost.
+        const [spaceship] = this.getBy('player', player).filter((spaceship) => spaceship.successful() === null);
         if (!spaceship) {
             return null;
         }
