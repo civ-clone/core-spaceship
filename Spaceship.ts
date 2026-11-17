@@ -17,6 +17,7 @@ import ChooseSlot from './Rules/ChooseSlot';
 import FlightTime from './Rules/FlightTime';
 import Landed from './Rules/Landed';
 import Launch from './Rules/Launch';
+import Launchable from './Rules/Launchable';
 import Layout from './Layout';
 import Lost from './Rules/Lost';
 import Part from './Part';
@@ -32,7 +33,8 @@ export interface ISpaceship extends IDataObject {
   lose(): void;
   flightTime(): number;
   inactiveParts(): Part[];
-  launch(): void;
+  launch(): boolean;
+  launchable(): boolean;
   launched(): false | number;
   layout(): Layout;
   player(): Player;
@@ -144,7 +146,15 @@ export class Spaceship extends DataObject implements ISpaceship {
     this._ruleRegistry.process(Lost, this);
   }
 
-  launch(): void {
+  /**
+   * Launches the ship, unless a `Launchable` rule says it may not go yet (`launchable()`): then nothing happens. Whether
+   * it launched.
+   */
+  launch(): boolean {
+    if (!this.launchable()) {
+      return false;
+    }
+
     this._ruleRegistry.process(Launch, this);
 
     this._landingTurn = this._launched = this._turn.value();
@@ -156,6 +166,18 @@ export class Spaceship extends DataObject implements ISpaceship {
     while (this._year.value(this._landingTurn) < targetYear) {
       this._landingTurn++;
     }
+
+    return true;
+  }
+
+  /**
+   * Whether the ship may launch now: every `Launchable` rule agrees, as a ruleset that needs a part on board first
+   * would have it. With no such rule, it may. Not sent to clients: a ruleset's action rule can ask it.
+   */
+  launchable(): boolean {
+    return this._ruleRegistry
+      .process(Launchable, this)
+      .every((launchable: boolean): boolean => launchable);
   }
 
   launched(): false | number {

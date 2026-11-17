@@ -15,6 +15,8 @@ A `Spaceship` is built using `Layout` which consists of `Slot`s and is chosen fr
 - `FlightTime` - returns the number of `Year`s the flight will take.
 - `Landed` - triggered when the `Spaceship` successfully lands at its destination.
 - `Launch` - triggered when the `Spaceship` is launched.
+- `Launchable` - whether the `Spaceship` may launch now (`launchable()`): every rule must agree, and `launch()` does
+  nothing while one says no. With none registered, any `Spaceship` may launch.
 - `Lost` - triggered when the `Spaceship` is lost (`lose()`): cancelled while it's being built, or never arriving once
   launched.
 - `Yield` - used to calculate the associated `Yield`s from each `Part` (`Mass`, `Fuel`, `Population`, etc).

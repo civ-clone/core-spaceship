@@ -11,6 +11,7 @@ const ChooseSlot_1 = require("./Rules/ChooseSlot");
 const FlightTime_1 = require("./Rules/FlightTime");
 const Landed_1 = require("./Rules/Landed");
 const Launch_1 = require("./Rules/Launch");
+const Launchable_1 = require("./Rules/Launchable");
 const Lost_1 = require("./Rules/Lost");
 class Spaceship extends DataObject_1.DataObject {
     constructor(player, layout, ruleRegistry = RuleRegistry_1.instance, turn = Turn_1.instance, year = Year_1.instance) {
@@ -75,7 +76,14 @@ class Spaceship extends DataObject_1.DataObject {
         this._successful = false;
         this._ruleRegistry.process(Lost_1.default, this);
     }
+    /**
+     * Launches the ship, unless a `Launchable` rule says it may not go yet (`launchable()`): then nothing happens. Whether
+     * it launched.
+     */
     launch() {
+        if (!this.launchable()) {
+            return false;
+        }
         this._ruleRegistry.process(Launch_1.default, this);
         this._landingTurn = this._launched = this._turn.value();
         const years = this.flightTime(), targetYear = this._year.value() + years;
@@ -83,6 +91,16 @@ class Spaceship extends DataObject_1.DataObject {
         while (this._year.value(this._landingTurn) < targetYear) {
             this._landingTurn++;
         }
+        return true;
+    }
+    /**
+     * Whether the ship may launch now: every `Launchable` rule agrees, as a ruleset that needs a part on board first
+     * would have it. With no such rule, it may. Not sent to clients: a ruleset's action rule can ask it.
+     */
+    launchable() {
+        return this._ruleRegistry
+            .process(Launchable_1.default, this)
+            .every((launchable) => launchable);
     }
     launched() {
         return this._launched;
