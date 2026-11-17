@@ -17,7 +17,8 @@ export interface ISpaceship extends IDataObject {
   lose(): void;
   flightTime(): number;
   inactiveParts(): Part[];
-  launch(): void;
+  launch(): boolean;
+  launchable(): boolean;
   launched(): false | number;
   layout(): Layout;
   player(): Player;
@@ -55,7 +56,16 @@ export declare class Spaceship extends DataObject implements ISpaceship {
    * say.
    */
   lose(): void;
-  launch(): void;
+  /**
+   * Launches the ship, unless a `Launchable` rule says it may not go yet (`launchable()`): then nothing happens. Whether
+   * it launched.
+   */
+  launch(): boolean;
+  /**
+   * Whether the ship may launch now: every `Launchable` rule agrees, as a ruleset that needs a part on board first
+   * would have it. With no such rule, it may. Not sent to clients: a ruleset's action rule can ask it.
+   */
+  launchable(): boolean;
   launched(): false | number;
   layout(): Layout;
   player(): Player;
